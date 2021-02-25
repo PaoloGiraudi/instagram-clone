@@ -1,8 +1,35 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useHistory } from "react-router-dom";
+import FirebaseContext from "../context/firebase";
 import * as ROUTES from "../constans/routes";
-import { Link } from "react-router-dom";
 
 export default function Login() {
+  const history = useHistory();
+  const { firebase } = useContext(FirebaseContext);
+
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState();
+  const isInvalid = password === "" || emailAddress === "";
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      await firebase.auth().signInWithEmailAndPassword(emailAddress, password);
+      history.push(ROUTES.DASHBOARD);
+    } catch (error) {
+      setEmailAddress("");
+      setPassword("");
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    document.title = "Login - Instagram";
+  }, []);
+
   return (
     <div
       className="
@@ -23,22 +50,32 @@ export default function Login() {
               className="mt-2 w-6/12 mb-4"
             />
           </h1>
-          <form method="POST">
+
+          {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+
+          <form onSubmit={handleLogin} method="POST">
             <input
               aria-label="Enter your email address"
               className="text-sm w-full mr-3 py-5 px-4 h-2 border rounded mb-2"
               type="text"
               placeholder="Email address"
+              value={emailAddress}
+              onChange={({ target }) => setEmailAddress(target.value)}
             />
             <input
               aria-label="Enter your password"
               className="text-sm w-full mr-3 py-5 px-4 h-2 border rounded mb-2"
               type="password"
               placeholder="Password"
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
             />
             <button
+              disabled={isInvalid}
               type="submit"
-              className={`bg-blue-500 text-white w-full rounded h-8 font-bold`}
+              className={`bg-blue-500 text-white w-full rounded h-8 font-bold ${
+                isInvalid && "cursor-not-allowed opacity-50"
+              }`}
             >
               Log In
             </button>
