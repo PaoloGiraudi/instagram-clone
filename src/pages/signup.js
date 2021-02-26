@@ -5,6 +5,7 @@ import * as ROUTES from "../constans/routes";
 import { doesUsernameExist } from "../services/firebase";
 
 export default function SignUp() {
+  const history = useHistory();
   const { firebase } = useContext(FirebaseContext);
 
   const [username, setUsername] = useState("");
@@ -43,6 +44,8 @@ export default function SignUp() {
           followers: [],
           dateCreated: Date.now(),
         });
+
+        history.push(ROUTES.DASHBOARD);
       } catch (error) {
         setFullName("");
         setError(error.message);
