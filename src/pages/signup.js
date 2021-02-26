@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link, useHistory } from "react-router-dom";
 import FirebaseContext from "../context/firebase";
 import * as ROUTES from "../constans/routes";
+import { doesUsernameExist } from "../services/firebase";
 
 export default function SignUp() {
-  // const history = useHistory();
-  // const { firebase } = useContext(FirebaseContext);
+  const { firebase } = useContext(FirebaseContext);
 
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
@@ -19,18 +19,42 @@ export default function SignUp() {
     password === "" ||
     emailAddress === "";
 
-  // const handleLogin = async (event) => {
-  //   event.preventDefault();
+  const handleSignup = async (event) => {
+    event.preventDefault();
 
-  //   try {
-  //     await firebase.auth().signInWithEmailAndPassword(emailAddress, password);
-  //     history.push(ROUTES.DASHBOARD);
-  //   } catch (error) {
-  //     setEmailAddress("");
-  //     setPassword("");
-  //     setError(error.message);
-  //   }
-  // };
+    const userNameExists = await doesUsernameExist(username);
+
+    if (!userNameExists.length) {
+      try {
+        const createdUserResult = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(emailAddress, password);
+
+        await createdUserResult.user.updateProfile({
+          displayName: username,
+        });
+
+        await firebase.firestore().collection("user").add({
+          userId: createdUserResult.user.uid,
+          username: username.toLowerCase(),
+          fullName: fullName,
+          emailAddress: emailAddress.toLowerCase(),
+          following: [],
+          followers: [],
+          dateCreated: Date.now(),
+        });
+      } catch (error) {
+        setFullName("");
+        setError(error.message);
+      }
+    } else {
+      setUsername("");
+      setFullName("");
+      setEmailAddress("");
+      setPassword("");
+      setError("That username is taken, please try another!");
+    }
+  };
 
   useEffect(() => {
     document.title = "Sign Up - Instagram";
@@ -53,7 +77,7 @@ export default function SignUp() {
 
           {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 
-          <form onSubmit={handleLogin} method="POST">
+          <form onSubmit={handleSignup} method="POST">
             <input
               aria-label="Enter your username"
               className="text-sm text-gray w-full mr-3 py-5 px-4 h-2 border bg-gray-background rounded mb-2"
