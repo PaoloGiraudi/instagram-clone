@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import FirebaseContext from "../context/firebase";
+import UserContext from "../context/user";
 import * as ROUTES from "../constans/routes";
 
 export default function Header() {
   const { firebase } = useContext(FirebaseContext);
-  const user = { displayName: "paolo" };
+  const { user } = useContext(UserContext);
 
   return (
     <header className="h-16 bg-white border-b mb-8">
@@ -70,9 +71,9 @@ export default function Header() {
                 <div className="flex items-center cursor-pointer">
                   <Link to={`/p/${user.displayName}`}>
                     <img
-                      src={`/images/avatars/${user.displayName}`}
-                      alt={`${user.displayName} profile picture`}
                       className="rounded-full h-8 w-8 flex"
+                      src={`/images/avatars/${user.displayName}.jpg`}
+                      alt={`${user.displayName} profile picture`}
                     />
                   </Link>
                 </div>
@@ -90,7 +91,7 @@ export default function Header() {
                 <Link to={ROUTES.SIGN_UP}>
                   <button
                     type="button"
-                    className="font-bold text-blue text-sm rounded  w-20 h-8"
+                    className="font-bold text-sm rounded text-blue w-20 h-8"
                   >
                     Sign Up
                   </button>
