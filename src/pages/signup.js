@@ -23,9 +23,9 @@ export default function SignUp() {
   const handleSignup = async (event) => {
     event.preventDefault();
 
-    const userNameExists = await doesUsernameExist(username);
+    const doesUsernameExistResult = await doesUsernameExist(username);
 
-    if (!userNameExists.length) {
+    if (doesUsernameExistResult && doesUsernameExistResult.length === 0) {
       try {
         const createdUserResult = await firebase
           .auth()
@@ -35,7 +35,7 @@ export default function SignUp() {
           displayName: username,
         });
 
-        await firebase.firestore().collection("user").add({
+        await firebase.firestore().collection("users").add({
           userId: createdUserResult.user.uid,
           username: username.toLowerCase(),
           fullName: fullName,
