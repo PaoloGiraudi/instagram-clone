@@ -10,7 +10,7 @@ export default function Header({ username }) {
           <img
             src={`images/avatars/${username}.jpg`}
             className="rounded-full h-8 w-8 flex mr-3"
-            alt={`${username} profile picture`}
+            alt={`${username} profile pic`}
           />
           <p className="font-bold">{username}</p>
         </Link>
