@@ -16,11 +16,17 @@ export default function Post({ content }) {
       <Image src={content.imageSrc} caption={content.caption} />
       <Actions
         docId={content.docId}
-        totaleLikes={content.likes.length}
+        totalLikes={content.likes.length}
         likedPhoto={content.userLikedPhoto}
         handleFocus={handleFocus}
       />
       <Footer username={content.username} caption={content.caption}></Footer>
+      <Comments
+        docId={content.docId}
+        comments={content.comments}
+        posted={content.dateCreated}
+        commentInput={commentInput}
+      />
     </div>
   );
 }
