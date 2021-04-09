@@ -1,3 +1,4 @@
+import user from "../components/sidebar/user";
 import { firebase, FieldValue } from "../lib/firebase";
 
 export async function doesUsernameExist(username) {
@@ -50,4 +51,16 @@ export async function getUserFollowedPhotos(userId, followingUserIds) {
   );
 
   return photosWithUserDetails;
+}
+
+export async function getSuggestedProfiles(userId) {
+  const result = await firebase.firestore().collection("users").limit(10).get();
+  const [{ following }] = await getUserByUserId(userId);
+
+  return result.docs
+    .map((user) => ({ ...user.data(), docId: user.id }))
+    .filter(
+      (profile) =>
+        profile.userId !== userId && !following.includes(profile.userId)
+    );
 }
