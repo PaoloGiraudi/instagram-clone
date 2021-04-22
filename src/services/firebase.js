@@ -1,5 +1,20 @@
-import user from "../components/sidebar/user";
 import { firebase, FieldValue } from "../lib/firebase";
+
+export async function isUserFollowingProfile(activeUsername, profileUserId) {
+  const result = await firebase
+    .firestore()
+    .collection("users")
+    .where("username", "==", activeUsername)
+    .where("following", "array-contains", profileUserId)
+    .get();
+
+  const [response = {}] = result.docs.map((item) => ({
+    ...item.data(),
+    docId: item.id,
+  }));
+
+  return !!response.fullName;
+}
 
 export async function doesUsernameExist(username) {
   const result = await firebase
@@ -91,7 +106,7 @@ export async function updateFollowedUserFollowers(
     .collection("users")
     .doc(docId)
     .update({
-      following: isFollowingProfile
+      followers: isFollowingProfile
         ? FieldValue.arrayRemove(followingUserId)
         : FieldValue.arrayUnion(followingUserId),
     });
@@ -140,4 +155,19 @@ export async function getUserPhotosByUsername(username) {
   }));
 
   return photos;
+}
+
+export async function toggleFollow(
+  isFollowingProfile,
+  activeUserDocId,
+  profileDocId,
+  profileId,
+  followingUserId
+) {
+  await updateUserFollowing(activeUserDocId, profileId, isFollowingProfile);
+  await updateFollowedUserFollowers(
+    profileDocId,
+    followingUserId,
+    isFollowingProfile
+  );
 }
