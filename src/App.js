@@ -1,6 +1,8 @@
 import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
+import ProtectedRoute from "./helpers/protected-route";
+
 import UserContext from "./context/user";
 import useAuthListener from "./hooks/use-auth-listener";
 import * as ROUTES from "./constans/routes";
@@ -22,7 +24,11 @@ export default function App() {
             <Route path={ROUTES.LOGIN} component={Login} />
             <Route path={ROUTES.SIGN_UP} component={SignUp} />
             <Route path={ROUTES.PROFILE} component={Profile} />
-            <Route path={ROUTES.DASHBOARD} component={Dashboard} exact />
+
+            <ProtectedRoute user={user} path={ROUTES.DASHBOARD} exact>
+              <Dashboard />
+            </ProtectedRoute>
+
             <Route component={NotFound} />
           </Switch>
         </Suspense>
